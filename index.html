@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Lost & Found - Login</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="container">
+    <!-- Left side -->
+    <div class="left-side">
+        <img src="logo.png" alt="Campus Logo" class="logo">
+        <h1>Welcome to Campus Lost & Found</h1>
+        <p>Quickly report or find lost items on campus. Safe, secure, and easy to use.</p>
+    </div>
+
+    <!-- Right side -->
+    <div class="right-side">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <div class="error-message" id="error" style="display: none;">
+            Please enter a valid email and password.
+        </div>
+        <button id="loginBtn">Login</button>
+
+        <div class="links">
+            <a href="#">Forgot Password?</a> | <a href="#">Sign Up</a>
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT INSIDE SAME FILE -->
+<script>
+    const loginBtn = document.getElementById('loginBtn');
+
+    loginBtn.addEventListener('click', function() {
+        const emailInput = document.getElementById('email').value.trim();
+        const passwordInput = document.getElementById('password').value.trim();
+        const error = document.getElementById('error');
+
+        // Simple sanitization function to prevent XSS
+        function sanitizeInput(str) {
+            return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#x27;")
+                .replace(/\//g, "&#x2F;");
+        }
+
+        // Validate required fields
+        if(emailInput === '' || passwordInput === '') {
+            error.textContent = 'Both fields are required.';
+            error.style.display = 'block';
+            return;
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailPattern.test(emailInput)) {
+            error.textContent = 'Please enter a valid email address.';
+            error.style.display = 'block';
+            return;
+        }
+
+        // Validate password (minimum 6 characters, no spaces)
+        if(passwordInput.length < 6 || /\s/.test(passwordInput)) {
+            error.textContent = 'Password must be at least 6 characters and contain no spaces.';
+            error.style.display = 'block';
+            return;
+        }
+
+        // Sanitize inputs before using them
+        const email = sanitizeInput(emailInput);
+        const password = sanitizeInput(passwordInput);
+
+        error.style.display = 'none';
+        alert(`Welcome, ${email}!`);
+    });
+</script>
+
+</body>
+</html>
