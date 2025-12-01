@@ -31,7 +31,6 @@
     </div>
 </div>
 
-<!-- JAVASCRIPT INSIDE SAME FILE -->
 <script>
     const loginBtn = document.getElementById('loginBtn');
 
@@ -65,19 +64,36 @@
             return;
         }
 
-        // Validate password (minimum 6 characters, no spaces)
-        if(passwordInput.length < 6 || /\s/.test(passwordInput)) {
-            error.textContent = 'Password must be at least 6 characters and contain no spaces.';
-            error.style.display = 'block';
-            return;
-        }
-
-        // Sanitize inputs before using them
+        // Sanitize inputs before sending
         const email = sanitizeInput(emailInput);
         const password = sanitizeInput(passwordInput);
 
         error.style.display = 'none';
-        alert(`Welcome, ${email}!`);
+
+        // AJAX request using Fetch API
+        fetch('login_process.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Redirect to dashboard on successful login
+                    window.location.href = 'dashboard.php';
+                } else {
+                    // Show error message from PHP
+                    error.textContent = data.message;
+                    error.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                error.textContent = 'An error occurred. Please try again later.';
+                error.style.display = 'block';
+                console.error(err);
+            });
     });
 </script>
 
