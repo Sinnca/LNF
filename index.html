@@ -39,7 +39,6 @@
         const passwordInput = document.getElementById('password').value.trim();
         const error = document.getElementById('error');
 
-        // Simple sanitization function to prevent XSS
         function sanitizeInput(str) {
             return str.replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -49,14 +48,13 @@
                 .replace(/\//g, "&#x2F;");
         }
 
-        // Validate required fields
+        // Validate fields
         if(emailInput === '' || passwordInput === '') {
             error.textContent = 'Both fields are required.';
             error.style.display = 'block';
             return;
         }
 
-        // Validate email format
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if(!emailPattern.test(emailInput)) {
             error.textContent = 'Please enter a valid email address.';
@@ -64,27 +62,22 @@
             return;
         }
 
-        // Sanitize inputs before sending
         const email = sanitizeInput(emailInput);
         const password = sanitizeInput(passwordInput);
 
         error.style.display = 'none';
 
-        // AJAX request using Fetch API
-        fetch('login_process.php', {
+        // AJAX login request
+        fetch('user_auth/login_process.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
         })
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    // Redirect to dashboard on successful login
-                    window.location.href = 'dashboard.php';
+                    window.location.href = 'dashboard.php'; // redirect after login
                 } else {
-                    // Show error message from PHP
                     error.textContent = data.message;
                     error.style.display = 'block';
                 }
