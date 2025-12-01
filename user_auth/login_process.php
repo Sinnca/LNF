@@ -16,6 +16,20 @@ if(empty($email) || empty($password)){
     exit;
 }
 
+//Validate email format
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(['success' => false, 'message' => 'Invalid email format.']);
+    exit;
+}
+
+
+//Ensure it is institutional email
+$allowed_domain = '@lspu.edu.ph';
+if (substr($email, -strlen($allowed_domain)) !== $allowed_domain) {
+    echo json_encode(['success' => false, 'message' => 'Only institutional emails are allowed.']);
+    exit;
+}
+
 // Prepare statement to prevent SQL injection
 $stmt = $conn->prepare("SELECT id, email, password FROM users WHERE email = ?");
 if(!$stmt){
@@ -28,10 +42,16 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
+if(!$user){
+   echo json_encode(['success' => false, 'message' => "Email doesn't exist."]);
+   exit;
+}
+
 if($user){
     // If passwords are hashed in DB
     if(password_verify($password, $user['password'])){
         session_start();
+        session_regenerate_id(true); // safer session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['email'] = $user['email'];
         echo json_encode(['success' => true]);
@@ -46,8 +66,6 @@ if($user){
     else{
         echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
     }
-} else {
-    echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
 }
 
 $stmt->close();
